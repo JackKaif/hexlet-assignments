@@ -17,5 +17,22 @@ class App {
         }
         return wordsFrequency;
     }
+    public static String toString(Map<String, Integer> map) {
+        var result = new StringBuilder();
+        if (map.isEmpty()) {
+            result.append("{}");
+            return result.toString();
+        }
+        result.append("{\n");
+        map.forEach((key, value) -> {
+            result.append("  ");
+            result.append(key);
+            result.append(": ");
+            result.append(value);
+            result.append("\n");
+        });
+        result.append("}");
+        return result.toString();
+    }
 }
 //END
