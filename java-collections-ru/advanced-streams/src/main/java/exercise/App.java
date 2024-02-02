@@ -6,7 +6,7 @@ import java.util.Arrays;
 // BEGIN
 class App {
     public static String getForwardedVariables(String file) {
-        var fileStringsList = Arrays.asList(file.split("\\r\n"));
+        var fileStringsList = Arrays.asList(file.split("\\n"));
         return fileStringsList.stream()
                 .filter(string -> string.startsWith("environment"))
                 .map(string -> {
