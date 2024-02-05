@@ -1,9 +1,10 @@
 package exercise;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // BEGIN
-public abstract class Tag {
+public class Tag {
     private final String tag;
     private final Map<String, String> attributes;
 
@@ -12,14 +13,17 @@ public abstract class Tag {
         this.attributes = attributes;
     }
 
-    public abstract String toString();
+    public String getAttributesLine() {
+        return attributes.keySet().stream()
+                .map(key -> {
+                    var value = attributes.get(key);
+                    return String.format(" %s=\"%s\"", key, value);
+                })
+                .collect(Collectors.joining(""));
+    }
 
     public String getTag() {
         return tag;
-    }
-
-    public Map<String, String> getAttributes() {
-        return attributes;
     }
 }
 // END

@@ -9,10 +9,7 @@ public class SingleTag extends Tag{
     }
 
     public String toString() {
-        var result = new StringBuilder(String.format("<%s", this.getTag()));
-        this.getAttributes().forEach((k, v) -> result.append(String.format(" %s=\"%s\"", k, v)));
-        result.append(">");
-        return result.toString();
+        return String.format("<%s%s>", getTag(), getAttributesLine());
     }
 }
 // END
