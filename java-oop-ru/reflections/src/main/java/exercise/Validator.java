@@ -1,5 +1,7 @@
 package exercise;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.ArrayList;
@@ -24,5 +26,34 @@ public class Validator {
         return notValidatedFields;
     }
 
+    public static Map<String, List<String>> advancedValidate(Object object) {
+        var notValidatedFields = new HashMap<String, List<String>>();
+        Field[] fields = object.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            var hasNotNullAnnotation = field.getAnnotation(NotNull.class) != null;
+            var hasMinLengthAnnotation = field.getAnnotation(MinLength.class) != null;
+            try {
+                var value = field.get(object);
+                var errorMessages = new ArrayList<String>();
+                if (value == null) {
+                    if (hasNotNullAnnotation) {
+                        errorMessages.add("can not be null");
+                    }
+                } else if (hasMinLengthAnnotation){
+                    var minLength = field.getAnnotation(MinLength.class).minLength();
+                    if (value.toString().length() < minLength) {
+                        errorMessages.add("length less than " + minLength);
+                    }
+                }
+                if (!errorMessages.isEmpty()) {
+                    notValidatedFields.put(field.getName(), errorMessages);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return notValidatedFields;
+    }
 }
 // END
