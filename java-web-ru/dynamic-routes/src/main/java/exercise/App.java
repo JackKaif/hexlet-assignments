@@ -3,9 +3,10 @@ package exercise;
 import io.javalin.Javalin;
 import java.util.List;
 import java.util.Map;
+import static java.util.Optional.ofNullable;
 
 // BEGIN
-import java.util.stream.Collectors;
+
 // END
 
 public final class App {
@@ -21,16 +22,16 @@ public final class App {
         // BEGIN
         app.get("/companies/{id}", ctx -> {
             var result = COMPANIES.stream()
-                    .filter(map -> map.get("id").equals(ctx.pathParam("id")))
-                    .flatMap(map -> map.entrySet().stream())
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-//                    .toList();
-            if (result.isEmpty()) {
-                ctx.status(404);
-                ctx.json("Company not found");
-            } else {
-                ctx.json(result);
-            }
+                    .filter(map -> ctx.pathParam("id").equals(map.get("id")))
+                    .findFirst()
+                    .orElse(null);
+            ofNullable(result)
+                    .map(ctx::json)
+                    .orElseGet(() -> {
+                        ctx.status(404);
+                        ctx.json("Company not found");
+                        return ctx;
+                    });
         });
         // END
 
