@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 // BEGIN
-
+import java.util.stream.Collectors;
 // END
 
 public final class App {
@@ -19,7 +19,19 @@ public final class App {
         });
 
         // BEGIN
-        
+        app.get("/companies/{id}", ctx -> {
+            var result = COMPANIES.stream()
+                    .filter(map -> map.get("id").equals(ctx.pathParam("id")))
+                    .flatMap(map -> map.entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//                    .toList();
+            if (result.isEmpty()) {
+                ctx.status(404);
+                ctx.json("Company not found");
+            } else {
+                ctx.json(result);
+            }
+        });
         // END
 
         app.get("/companies", ctx -> {
