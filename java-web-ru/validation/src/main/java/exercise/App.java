@@ -40,14 +40,7 @@ public final class App {
         app.post("/articles", ctx -> {
             try {
                 var name = ctx.formParamAsClass("title", String.class)
-                        .check(value -> {
-                            var exists = ArticleRepository.getEntities().stream()
-                                    .map(Article::getTitle)
-                                    .filter(value::equals)
-                                    .findFirst()
-                                    .orElse(null);
-                            return exists == null;
-                        }, "Статья с таким названием уже существует")
+                        .check(value -> !ArticleRepository.existsByTitle(value), "Статья с таким названием уже существует")
                         .check(value -> value.length() > 2, "Название не должно быть короче двух символов")
                         .get();
                 var content = ctx.formParamAsClass("content", String.class)
