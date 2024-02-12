@@ -1,6 +1,8 @@
 package exercise;
 
 import io.javalin.Javalin;
+
+import java.util.Comparator;
 import java.util.List;
 import exercise.model.User;
 import exercise.dto.users.UsersPage;
@@ -19,7 +21,24 @@ public final class App {
         });
 
         // BEGIN
-        
+        app.get("/users", ctx -> {
+            var term = ctx.queryParam("term");
+            List<User> filteredUsers;
+            var sortedUsers = USERS.stream()
+                    .sorted(Comparator.comparing(User::getFirstName))
+                    .toList();
+            if (term != null) {
+                filteredUsers = sortedUsers.stream()
+                        .filter(user -> user.getFirstName()
+                                .toLowerCase()
+                                .startsWith(term.toLowerCase()))
+                        .toList();
+            } else {
+                filteredUsers = sortedUsers;
+            }
+            var page = new UsersPage(filteredUsers, term);
+            ctx.render("users/index.jte", Collections.singletonMap("page", page));
+        });
         // END
 
         app.get("/", ctx -> {
