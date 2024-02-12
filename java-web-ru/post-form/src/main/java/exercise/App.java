@@ -3,6 +3,8 @@ package exercise;
 import io.javalin.Javalin;
 import java.util.List;
 import java.util.Collections;
+import java.util.Objects;
+
 import exercise.model.User;
 import exercise.dto.users.UsersPage;
 import exercise.repository.UserRepository;
@@ -28,7 +30,17 @@ public final class App {
         });
 
         // BEGIN
-        
+        app.get("/users/build", ctx -> ctx.render("users/build.jte"));
+
+        app.post("/users", ctx -> {
+            var firstName = StringUtils.capitalize(ctx.formParam("firstName"));
+            var lastName = StringUtils.capitalize(ctx.formParam("lastName"));
+            var email = Objects.requireNonNull(ctx.formParam("email")).trim().toLowerCase();
+            var password = Security.encrypt(Objects.requireNonNull(ctx.formParam("password")));
+            var user = new User(firstName, lastName, email, password);
+            UserRepository.save(user);
+            ctx.redirect("/users");
+        });
         // END
 
         return app;
