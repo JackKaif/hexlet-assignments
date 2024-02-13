@@ -1,17 +1,20 @@
 package exercise.controller;
 
 import java.util.Collections;
+import java.util.Objects;
+
 import exercise.dto.posts.PostsPage;
 import exercise.dto.posts.PostPage;
 import exercise.model.Post;
 import exercise.repository.PostRepository;
 import exercise.dto.posts.BuildPostPage;
-import exercise.dto.posts.EditPostPage;
+//import exercise.dto.posts.EditPostPage;
 import exercise.util.NamedRoutes;
 
 import io.javalin.http.Context;
 import io.javalin.validation.ValidationException;
 import io.javalin.http.NotFoundResponse;
+import org.jetbrains.annotations.NotNull;
 
 public class PostsController {
 
@@ -29,9 +32,16 @@ public class PostsController {
             var body = ctx.formParamAsClass("body", String.class)
                 .check(value -> value.length() >= 10, "Пост должен быть не короче 10 символов")
                 .get();
-
-            var post = new Post(name, body);
-            PostRepository.save(post);
+            if (ctx.formParam("_method") != null) {
+                if ("PATCH".equals(ctx.formParam("_method"))) {
+                    var id = ctx.pathParamAsClass("{id}", Long.class).get();
+                    var post = PostRepository.find(id).get();
+                    post.setName(name);
+                    post.setBody(body);
+                }
+            } else {
+                PostRepository.save(new Post(name, body));
+            }
             ctx.redirect(NamedRoutes.postsPath());
 
         } catch (ValidationException e) {
@@ -58,6 +68,12 @@ public class PostsController {
     }
 
     // BEGIN
-    
+    public static void edit(Context ctx) {
+        var id = ctx.pathParamAsClass("id", Long.class).get();
+        var post = PostRepository.find(id)
+                .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
+        var page = new PostPage(post);
+        ctx.render("posts/edit.jte", Collections.singletonMap("page", page));
+    }
     // END
 }
