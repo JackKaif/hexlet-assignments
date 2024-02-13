@@ -7,9 +7,9 @@ content = @`
     @if(page.getName() != null)
         ${page.getName().toString()}
         <form action="${NamedRoutes.logoutPath()}" method="post">
-            <input type="submit" value="Р’С‹Р№С‚Рё">
+            <input type="submit" value="Выйти">
         </form>
     @else
-        <p><a href="${NamedRoutes.buildSessionPath()}">Р’РѕР№С‚Рё</a></p>
+        <p><a href="${NamedRoutes.buildSessionPath()}">Войти</a></p>
     @endif
 `)
