@@ -4,6 +4,8 @@ import io.javalin.Javalin;
 import exercise.controller.UsersController;
 import exercise.util.NamedRoutes;
 
+import javax.naming.Name;
+
 public final class App {
 
     public static Javalin getApp() {
@@ -13,7 +15,8 @@ public final class App {
         });
 
         // BEGIN
-        
+        app.post(NamedRoutes.usersPath(), UsersController::create);
+        app.get(NamedRoutes.buildUserPath(), UsersController::build);
         // END
 
         app.get(NamedRoutes.userPath("{id}"), UsersController::show);
