@@ -1,8 +1,12 @@
 package exercise;
 
+import exercise.dto.MainPage;
+import exercise.repository.UsersRepository;
 import io.javalin.Javalin;
 import exercise.controller.SessionsController;
 import exercise.util.NamedRoutes;
+
+import java.util.Collections;
 
 
 public final class App {
@@ -14,7 +18,13 @@ public final class App {
         });
 
         // BEGIN
-        
+        app.get(NamedRoutes.rootPath(), ctx -> {
+            var page = new MainPage(ctx.sessionAttribute("currentUser"));
+            ctx.render("index.jte", Collections.singletonMap("page", page));
+        });
+        app.get(NamedRoutes.buildSessionPath(), SessionsController::build);
+        app.post(NamedRoutes.loginPath(), SessionsController::create);
+        app.post(NamedRoutes.logoutPath(), SessionsController::destroy);
         // END
 
         return app;
