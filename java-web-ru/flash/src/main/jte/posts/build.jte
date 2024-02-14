@@ -21,7 +21,7 @@
                 <div class="mb-3">
                     <label class="form-label">
                         Название
-                        <input type="text" class="form-control" name="name" value="${page.getName()}" />
+                        <input type="text" placeholder="Не менее двух символов" class="form-control" name="name" value="${page.getName()}" />
                     </label>
                 </div>
                 <div class="mb-3">
@@ -31,5 +31,5 @@
                 <input type="submit" class="btn btn-primary" value="Сохранить" />
             </form>
         </div>
-    `,
+    `
 )

@@ -19,7 +19,30 @@ public class PostsController {
     }
 
     // BEGIN
-    
+    public static void index(Context ctx) {
+        var page = new PostsPage(PostRepository.getEntities());
+        page.setFlashMessage(ctx.consumeSessionAttribute("flash"));
+        ctx.render("posts/index.jte", Collections.singletonMap("page", page));
+    }
+
+    public static void create(Context ctx) {
+        try {
+            var name = ctx.formParamAsClass("name", String.class)
+                    .check(value -> value.length() >= 2, "Слишком короткое имя")
+                    .get();
+            var body = ctx.formParamAsClass("body", String.class)
+                    .get();
+            ctx.sessionAttribute("flash", "Пост был успешно создан!");
+            PostRepository.save(new Post(name, body));
+            ctx.redirect(NamedRoutes.postsPath());
+        } catch (ValidationException e) {
+            var name = ctx.pathParam("name");
+            var body = ctx.pathParam("body");
+            var page = new BuildPostPage(name, body, e.getErrors());
+            ctx.sessionAttribute("flash", "Неверный ввод данных");
+            ctx.render("posts/build.jte", Collections.singletonMap("page", page));
+        }
+    }
     // END
 
     public static void show(Context ctx) {
