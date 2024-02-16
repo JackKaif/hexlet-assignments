@@ -35,16 +35,10 @@ public class ProductsController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public Product create(@RequestBody Product newProduct) {
-        var product = productRepository.findAll()
-                .stream()
-                .filter(newProduct::equals)
-                .findFirst();
-        if (product.isEmpty()) {
-            return productRepository.save(newProduct);
-        } else {
+        if (productRepository.findAll().contains(newProduct)) {
             throw new ResourceAlreadyExistsException("Product already exists");
         }
-
+        return productRepository.save(newProduct);
     }
     // END
 
