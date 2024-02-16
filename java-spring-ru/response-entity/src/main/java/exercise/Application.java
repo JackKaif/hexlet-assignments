@@ -29,7 +29,50 @@ public class Application {
     }
 
     // BEGIN
-    
+    @GetMapping("/posts")
+    public ResponseEntity<List<Post>> index() {
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(posts.size()))
+                .body(posts);
+    }
+
+    @GetMapping("/posts/{id}")
+    public ResponseEntity<?> show(@PathVariable String id) {
+        var searchedPost = posts.stream()
+                .filter(post -> id.equals(post.getId()))
+                .findFirst();
+        if (searchedPost.isPresent()) {
+            return ResponseEntity.of(searchedPost);
+        } else {
+            return ResponseEntity.status(404)
+                    .body(id);
+        }
+    }
+
+    @PostMapping("/posts")
+    public ResponseEntity<Post> create(@RequestBody Post post) {
+        posts.add(post);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(post);
+    }
+
+    @PutMapping("/posts/{id}")
+    public ResponseEntity<?> update(@RequestBody Post updatedPost,
+                                    @PathVariable String id) {
+        var searchedPost = posts.stream()
+                .filter(post -> id.equals(post.getId()))
+                .findFirst();
+        if (searchedPost.isPresent()) {
+            var editedPost = searchedPost.get();
+            editedPost.setTitle(updatedPost.getTitle());
+            editedPost.setBody(updatedPost.getBody());
+            posts.add(editedPost);
+            return ResponseEntity.ok(editedPost);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(updatedPost);
+        }
+    }
     // END
 
     @DeleteMapping("/posts/{id}")
