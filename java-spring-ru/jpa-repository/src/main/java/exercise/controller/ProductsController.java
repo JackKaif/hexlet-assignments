@@ -25,10 +25,7 @@ public class ProductsController {
     // BEGIN
     @GetMapping("")
     public List<Product> index(@RequestParam(defaultValue = "0") int min,
-                               @RequestParam(defaultValue = "-1") int max) {
-        if (max < min) {
-            max = Integer.MAX_VALUE;
-        }
+                               @RequestParam(defaultValue = Integer.MAX_VALUE + "") int max) {
         return productRepository.findByPriceBetween(min, max)
                 .stream()
                 .sorted(Comparator.comparing(Product::getPrice))
