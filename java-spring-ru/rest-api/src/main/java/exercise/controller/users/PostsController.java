@@ -13,17 +13,17 @@ import exercise.Data;
 public class PostsController {
     private static final List<Post> posts = Data.getPosts();
     @GetMapping("/users/{id}/posts")
-    public static List<Post> index(@PathVariable String id) {
+    public static List<Post> index(@PathVariable Integer id) {
         return posts.stream()
-                .filter(post -> id.equals(String.valueOf(post.getUserId())))
+                .filter(post -> id== post.getUserId())
                 .toList();
     }
 
     @PostMapping("/users/{id}/posts")
     @ResponseStatus(HttpStatus.CREATED)
-    public static Post create(@PathVariable String id,
+    public static Post create(@PathVariable Integer id,
                               @RequestBody Post post) {
-        post.setUserId(Integer.parseInt(id));
+        post.setUserId(id);
         posts.add(post);
         return post;
     }
