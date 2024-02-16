@@ -1,5 +1,6 @@
 package exercise;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,17 @@ public class Application {
     private List<User> users = Data.getUsers();
 
     // BEGIN
-    
+    @Autowired
+    private UserProperties adminsEmails;
+
+    @GetMapping("/admins")
+    public List<String> adminsIndex() {
+        return users.stream()
+                .filter(user -> adminsEmails.getAdmins().contains(user.getEmail()))
+                .map(User::getName)
+                .sorted()
+                .toList();
+    }
     // END
 
     @GetMapping("/users")
