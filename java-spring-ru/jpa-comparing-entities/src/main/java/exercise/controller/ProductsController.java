@@ -32,7 +32,20 @@ public class ProductsController {
     }
 
     // BEGIN
-    
+    @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Product create(@RequestBody Product newProduct) {
+        var product = productRepository.findAll()
+                .stream()
+                .filter(newProduct::equals)
+                .findFirst();
+        if (product.isEmpty()) {
+            return productRepository.save(newProduct);
+        } else {
+            throw new ResourceAlreadyExistsException("Product already exists");
+        }
+
+    }
     // END
 
     @GetMapping(path = "/{id}")
