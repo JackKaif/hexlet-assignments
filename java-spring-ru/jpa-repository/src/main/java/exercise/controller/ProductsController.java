@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Sort;
 
+import java.util.Comparator;
 import java.util.List;
 
 import exercise.model.Product;
@@ -22,7 +23,17 @@ public class ProductsController {
     private ProductRepository productRepository;
 
     // BEGIN
-    
+    @GetMapping("")
+    public List<Product> index(@RequestParam(defaultValue = "0") int min,
+                               @RequestParam(defaultValue = "-1") int max) {
+        if (max < min) {
+            max = Integer.MAX_VALUE;
+        }
+        return productRepository.findByPriceBetween(min, max)
+                .stream()
+                .sorted(Comparator.comparing(Product::getPrice))
+                .toList();
+    }
     // END
 
     @GetMapping(path = "/{id}")
