@@ -21,6 +21,31 @@ public class ContactsController {
     private ContactRepository contactRepository;
 
     // BEGIN
-    
+    @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ContactDTO create(@RequestBody ContactCreateDTO newContact) {
+        Contact contact = toEntity(newContact);
+        contactRepository.save(contact);
+        return toDTO(contact);
+    }
+
+    private ContactDTO toDTO(Contact savedContact) {
+        var result = new ContactDTO();
+        result.setId(savedContact.getId());
+        result.setFirstName(savedContact.getFirstName());
+        result.setLastName(savedContact.getLastName());
+        result.setPhone(savedContact.getPhone());
+        result.setCreatedAt(savedContact.getCreatedAt());
+        result.setUpdatedAt(savedContact.getCreatedAt());
+        return result;
+    }
+
+    private Contact toEntity(ContactCreateDTO newContact) {
+        var contact = new Contact();
+        contact.setFirstName(newContact.getFirstName());
+        contact.setLastName(newContact.getLastName());
+        contact.setPhone(newContact.getPhone());
+        return contact;
+    }
     // END
 }
