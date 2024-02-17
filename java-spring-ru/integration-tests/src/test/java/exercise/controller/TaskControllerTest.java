@@ -1,5 +1,6 @@
 package exercise.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +25,8 @@ import exercise.repository.TaskRepository;
 import exercise.model.Task;
 
 // BEGIN
-
+@SpringBootTest
+@AutoConfigureMockMvc
 // END
 class ApplicationTest {
 
@@ -71,6 +73,55 @@ class ApplicationTest {
     }
 
     // BEGIN
-    
+    @Test
+    public void testShow() throws Exception {
+        var task = generateTask();
+        task = taskRepository.save(task);
+
+        var result = mockMvc.perform(get("/tasks/" + task.getId()))
+                .andExpect(status().isOk())
+                .andReturn();
+        var body = result.getResponse().getContentAsString();
+
+        assertThatJson(body).isObject().containsEntry("title", task.getTitle());
+        assertThatJson(body).isObject().containsEntry("description", task.getDescription());
+    }
+
+    @Test
+    public void testCreate() throws Exception {
+        var task = generateTask();
+        var request = post("/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(task));
+        mockMvc.perform(request)
+                .andExpect(status().isCreated());
+
+        assertThat(taskRepository.findByTitle(task.getTitle()).isPresent()).isTrue();
+    }
+
+    @Test
+    public void testUpdate() throws Exception {
+        var task = generateTask();
+        task = taskRepository.save(task);
+        var editedTask = generateTask();
+        var request = put("/tasks/" + task.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(editedTask));
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+        assertThat(taskRepository.findByTitle(editedTask.getTitle()).isPresent()).isTrue();
+        var taskFromRepo = taskRepository.findByTitle(editedTask.getTitle())
+                .get();
+        assertThat(taskFromRepo.getDescription()).isEqualTo(editedTask.getDescription());
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        var task = generateTask();
+        task = taskRepository.save(task);
+        mockMvc.perform(delete("/tasks/" + task.getId()))
+                .andExpect(status().isOk());
+        assertThat(taskRepository.findById(task.getId()).isPresent()).isFalse();
+    }
     // END
 }
