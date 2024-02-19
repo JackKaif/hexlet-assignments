@@ -41,6 +41,7 @@ public class Task {
     private LocalDate updatedAt;
 
     // BEGIN
-    
+    @ManyToOne
+    private User assignee;
     // END
 }
