@@ -36,7 +36,19 @@ public class ProductsController {
     private ProductMapper productMapper;
 
     // BEGIN
-    
+    @Autowired
+    private ProductSpecification productSpecification;
+
+    @GetMapping("")
+    public List<ProductDTO> index (ProductParamsDTO params,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   @RequestParam(defaultValue = "10") int limit) {
+        var spec = productSpecification.build(params);
+        var products = productRepository.findAll(spec, PageRequest.of(page - 1, limit));
+        return products.stream()
+                .map(productMapper::map)
+                .toList();
+    }
     // END
 
     @PostMapping("")
