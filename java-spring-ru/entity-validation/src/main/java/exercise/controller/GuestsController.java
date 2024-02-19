@@ -46,6 +46,12 @@ public class GuestsController {
     }
 
     // BEGIN
-    
+    @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
+    public GuestDTO create(@Valid @RequestBody GuestCreateDTO newGuest) {
+        var guest = guestMapper.map(newGuest);
+        guestRepository.save(guest);
+        return guestMapper.map(guest);
+    }
     // END
 }
