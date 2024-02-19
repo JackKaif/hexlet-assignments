@@ -58,6 +58,8 @@ public class TasksController {
     @ResponseStatus(HttpStatus.CREATED)
     public TaskDTO create(@RequestBody TaskCreateDTO newTask) {
         var task = taskMapper.map(newTask);
+        var user = userRepository.findById(newTask.getAssigneeId()).get();
+        user.addTask(task);
         taskRepository.save(task);
         return taskMapper.map(task);
     }
