@@ -156,9 +156,10 @@ class AuthorsControllerTest {
         assertThat(author.getFirstName()).isEqualTo(dto.get("firstName"));
     }
 
+    @Test
     public void testDestroy() throws Exception {
         authorRepository.save(testAuthor);
-        var request = delete("/books/{id}", testAuthor.getId());
+        var request = delete("/authors/{id}", testAuthor.getId());
         mockMvc.perform(request)
                 .andExpect(status().isOk());
 

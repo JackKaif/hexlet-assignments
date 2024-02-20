@@ -170,6 +170,7 @@ class BooksControllerTest {
         assertThat(task.getAuthor().getId()).isEqualTo(dto.get("authorId"));
     }
 
+    @Test
     public void testDestroy() throws Exception {
         bookRepository.save(testBook);
         var request = delete("/books/{id}", testBook.getId());
