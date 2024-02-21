@@ -1,6 +1,8 @@
 package exercise;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.nio.file.Paths;
 import java.nio.file.Path;
@@ -38,6 +40,16 @@ public class App {
         }).exceptionally(e -> {
             System.out.println("NoSuchFileException");
             return null;
+        });
+    }
+
+    public static CompletableFuture<Long> getDirectorySize(String directoryPath) {
+        return CompletableFuture.supplyAsync(() -> {
+            var dir = new File(Path.of(directoryPath).toAbsolutePath().normalize().toString());
+            var filesList = dir.listFiles();
+            if (filesList != null) {
+                return Arrays.stream(filesList).filter(File::isFile).count();
+            } else return 0L;
         });
     }
     // END

@@ -46,6 +46,11 @@ class AppTest {
     }
 
     // BEGIN
-    
+    @Test
+    void testGetDirectorySize() throws Exception {
+        var result = App.getDirectorySize("src/test/resources/dir");
+        var filesCount = result.get();
+        assertThat(filesCount).isEqualTo(3L);
+    }
     // END
 }
