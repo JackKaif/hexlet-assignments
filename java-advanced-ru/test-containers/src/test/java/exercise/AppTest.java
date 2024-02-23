@@ -25,7 +25,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @AutoConfigureMockMvc
 
 // BEGIN
-
+@Testcontainers
+@Transactional
 // END
 public class AppTest {
 
@@ -33,7 +34,63 @@ public class AppTest {
     private MockMvc mockMvc;
 
     // BEGIN
-    
+    @Container
+    private static PostgreSQLContainer<?> database = new PostgreSQLContainer<>("postgres")
+            .withDatabaseName("dbname")
+            .withUsername("tester")
+            .withPassword("test")
+            .withInitScript("init.sql");
+    @DynamicPropertySource
+    public static void properties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", database::getJdbcUrl);
+        registry.add("spring.datasource.username", database::getUsername);
+        registry.add("spring.datasource.password", database::getPassword);
+    }
+
+    @Test
+    void testGetPeople() throws Exception {
+        var response = mockMvc.perform(get("/people"))
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(200);
+    }
+
+    @Test
+    void testGetPerson() throws Exception {
+        var response = mockMvc.perform(get("/people/3"))
+                .andReturn()
+                .getResponse();
+        assertThat(response.getContentAsString()).contains("Jassica", "Simpson");
+    }
+
+    @Test
+    void testUpdatePerson() throws Exception {
+        var responsePatch = mockMvc.perform(patch("/people/3")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"firstName\": \"Jessica\", \"lastName\": \"Singleton\"}"))
+                .andReturn()
+                .getResponse();
+        assertThat(responsePatch.getStatus()).isEqualTo(200);
+
+        var response = mockMvc.perform(get("/people/3"))
+                .andReturn()
+                .getResponse();
+        assertThat(response.getContentAsString()).contains("Jessica", "Singleton");
+        assertThat(response.getContentAsString()).doesNotContain("Jassica", "Simpson");
+    }
+
+    @Test
+    void testDeletePerson() throws Exception {
+        var responseDelete = mockMvc.perform(delete("/people/3"))
+                .andReturn()
+                .getResponse();
+        assertThat(responseDelete.getStatus()).isEqualTo(200);
+
+        var response = mockMvc.perform(get("/people"))
+                .andReturn()
+                .getResponse();
+        assertThat(response.getContentAsString()).doesNotContain("Jassica", "Simpson");
+    }
     // END
 
     @Test
